@@ -8,11 +8,18 @@ void TimeManager::init(){
 	_time = millis();
 	_previousTime = _time;
 	_deltaTime = 0;
+	_maxTimeCount = 0;
 }
 
 void TimeManager::loopStart(){
 	_time = millis();
-	_deltaTime = _time >= _previousTime ? _time - _previousTime : (ULONG_MAX - _previousTime + _time);
+	if(_time >= _previousTime){
+		_deltaTime = _time - _previousTime;
+	}
+	else{
+		_deltaTime = (ULONG_MAX - _previousTime + _time);
+		_maxTimeCount++;
+	}
 }
 
 void TimeManager::loopEnd(){
@@ -25,4 +32,8 @@ unsigned long TimeManager::total(){
 
 unsigned long TimeManager::delta(){
 	return _deltaTime;
+}
+
+int TimeManager::maxTimeCount(){
+	return _maxTimeCount;
 }

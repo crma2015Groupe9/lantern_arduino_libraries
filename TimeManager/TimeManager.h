@@ -14,11 +14,13 @@ class TimeManager
 
 		unsigned long total();
 		unsigned long delta();
+		int maxTimeCount();
 		
 	private:
 		unsigned long _time;
 		unsigned long _previousTime;
 		unsigned long _deltaTime;
+		int _maxTimeCount;
 };
 
 #endif
