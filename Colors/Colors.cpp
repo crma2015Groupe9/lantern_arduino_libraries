@@ -1,29 +1,24 @@
 #include "Arduino.h"
 #include "Colors.h"
 
-Colors::Colors(byte red, byte green, byte blue, float alpha){
-	_red = red;
-	_green = green;
-	_blue = blue;
-	_alpha = alpha < 0 ? 0 : (alpha > 1 ? 1 : alpha);
+Colors::Colors(){
+	_red = 0;
+	_green = 0;
+	_blue = 0;
 }
 
 Colors::Colors(byte red, byte green, byte blue){
 	_red = red;
 	_green = green;
 	_blue = blue;
-	_alpha = 1.0;
 }
 
-void Colors::setColor(byte red, byte green, byte blue, float alpha){
+void Colors::setColor(byte red, byte green, byte blue){
 	setRed(red);
 	setGreen(green);
 	setBlue(blue);
-	setAlpha(alpha);
 }
-void Colors::setColor(byte red, byte green, byte blue){
-	setColor(red, green, blue, 1.0);
-}
+
 void Colors::setRed(byte value){
 	_red = value;
 }
@@ -32,9 +27,6 @@ void Colors::setGreen(byte value){
 }
 void Colors::setBlue(byte value){
 	_blue = value;
-}
-void Colors::setAlpha(float value){
-	_alpha = value < 0 ? 0 : (value > 1 ? 1 : value);
 }
 
 byte Colors::red(){
@@ -46,32 +38,9 @@ byte Colors::green(){
 byte Colors::blue(){
 	return _blue;
 }
-float Colors::alpha(){
-	return _alpha;
-}
-float Colors::alphaMap(float min, float max){
-	float temp;
-
-	if (min > max)
-	{
-		temp = max;
-		max = min;
-		min = temp;
-	}
-
-	return min+((max - min)*_alpha);
-}
-
-float Colors::alphaMap(float max){
-	return alphaMap(0, max);
-}
 
 Colors Colors::getGradientStep(double cursorPosition, Colors targetColor){
 	double start, end, finalRed, finalGreen, finalBlue;
-	float startAlpha, endAlpha, finalAlpha;
-
-	startAlpha = alpha(); endAlpha = targetColor.alpha();
-	finalAlpha = (float)((double)startAlpha+(((double)endAlpha - (double)startAlpha)*cursorPosition));
 
 	start = (double)red(); end = (double)targetColor.red();
 	finalRed = start+((end - start)*cursorPosition);
@@ -85,6 +54,25 @@ Colors Colors::getGradientStep(double cursorPosition, Colors targetColor){
 	finalBlue = start+((end - start)*cursorPosition);
 	finalBlue = finalBlue < 0 ? 0 : (finalBlue > 255 ? 255 : finalBlue);
 
-	return Colors((byte)finalRed, (byte)finalGreen, (byte)finalBlue, finalAlpha);
+	return Colors((byte)finalRed, (byte)finalGreen, (byte)finalBlue);
+}
+
+Colors Colors::getColorWithAlpha(float alpha){
+	double start, finalRed, finalGreen, finalBlue;
+	float opacity = 1.0 - alpha;
+
+	start = (double)red();
+	finalRed = start * (double)opacity;
+	finalRed = finalRed < 0 ? 0 : (finalRed > 255 ? 255 : finalRed);
+
+	start = (double)green();
+	finalGreen = start * (double)opacity;
+	finalGreen = finalGreen < 0 ? 0 : (finalGreen > 255 ? 255 : finalGreen);
+
+	start = (double)blue();
+	finalBlue = start * (double)opacity;
+	finalBlue = finalBlue < 0 ? 0 : (finalBlue > 255 ? 255 : finalBlue);
+
+	return Colors((byte)finalRed, (byte)finalGreen, (byte)finalBlue);
 }
 
