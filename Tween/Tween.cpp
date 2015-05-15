@@ -1,188 +1,168 @@
 #include "Arduino.h"
 #include "Tween.h"
 
-Tween::Tween(int startValue, int endValue, unsigned long duration, unsigned long delay){
+Tween::Tween(int startValue, int endValue, unsigned int duration, unsigned int delay){
+	_stateBitList = 0;
 	_startValue = startValue;
 	_endValue = endValue;
 	_duration = duration;
 	_delay = delay;
 	_currentTime = 0;
 	_cursor = 0;
-	_ended = false;
-	_ready = true;
-	_pause = false;
-	_loop = false;
-	_loopWithDelay = false;
+	_ended(false);
+	_ready(true);
+	_pause(false);
+	_loop(false);
+	_loopWithDelay(false);
 	_loopDelay = 0;
-	_loopCount = 0;
-	_maxNumberOfLoop = 0;
-	_reverseLoop = false;
-	_currentLoopReversed = false;
+	_reverseLoop(false);
+	_currentLoopReversed(false);
+	_isFirstLoop(true);
 }
 
-Tween::Tween(int startValue, int endValue, unsigned long duration){
+Tween::Tween(int startValue, int endValue, unsigned int duration){
+	_stateBitList = 0;
 	_startValue = startValue;
 	_endValue = endValue;
 	_duration = duration;
 	_delay = 0;
 	_currentTime = 0;
 	_cursor = 0;
-	_ended = false;
-	_ready = true;
-	_pause = false;
-	_loop = false;
-	_loopWithDelay = false;
+	_ended(false);
+	_ready(true);
+	_pause(false);
+	_loop(false);
+	_loopWithDelay(false);
 	_loopDelay = 0;
-	_loopCount = 0;
-	_maxNumberOfLoop = 0;
-	_reverseLoop = false;
-	_currentLoopReversed = false;
+	_reverseLoop(false);
+	_currentLoopReversed(false);
+	_isFirstLoop(true);
 }
 
 Tween::Tween(){
+	_stateBitList = 0;
 	_startValue = 0;
 	_endValue = 0;
 	_duration = 0;
 	_delay = 0;
 	_currentTime = 0;
 	_cursor = 0;
-	_ended = false;
-	_ready = false;
-	_pause = false;
-	_loop = false;
-	_loopWithDelay = false;
+	_ended(false);
+	_ready(false);
+	_pause(false);
+	_loop(false);
+	_loopWithDelay(false);
 	_loopDelay = 0;
-	_loopCount = 0;
-	_maxNumberOfLoop = 0;
-	_reverseLoop = false;
-	_currentLoopReversed = false;
+	_reverseLoop(false);
+	_currentLoopReversed(false);
+	_isFirstLoop(true);
 }
 
-void Tween::update(unsigned long deltaTime){
+void Tween::update(unsigned int deltaTime){
 	int temp;
-	if (_ready && !_ended)
+
+	if (_ready() && !_ended())
 	{
-		_currentTime += _pause ? 0 : deltaTime;
+		_currentTime += _pause() ? 0 : deltaTime;
 		if (_currentTime > _delay)
 		{
-			_cursor = (double)(_currentTime - _delay)/(double)_duration;
+			_cursor = (float)(_currentTime - _delay)/(float)_duration;
 		}
 
 		if (_currentTime >= _duration+_delay){
 			_cursor = 1;
 			_currentTime = _duration+_delay;
-			_ended = true;
+			_ended(true);
 
-			if(_loop && (_maxNumberOfLoop == 0 || (_loopCount+1) < _maxNumberOfLoop)){
-				_ended = false;
-				_ready = true;
+			if(_loop()){
+				_ended(false);
+				_ready(true);
 				_currentTime = 0;
-				_delay = _loopWithDelay ? _loopDelay : _delay;
+				_delay = _loopWithDelay() ? _loopDelay : _delay;
 
-				if (_reverseLoop)
+				if (_reverseLoop())
 				{
-					_currentLoopReversed = !_currentLoopReversed;
+					_currentLoopReversed(!_currentLoopReversed());
 				}
 
-				_loopCount++;
+				_isFirstLoop(false);
 			}
 		}
 	}
 }
 
 void Tween::reverseLoop(){
-	_reverseLoop = true;
+	_reverseLoop(true);
 }
 
 void Tween::normalLoop(){
-	_reverseLoop = false;
+	_reverseLoop(false);
 }
 
-void Tween::transition(int startValue, int endValue, unsigned long duration, unsigned long delay){
+void Tween::transition(int startValue, int endValue, unsigned int duration, unsigned int delay){
+	_stateBitList = 0;
 	_startValue = startValue;
 	_endValue = endValue;
 	_duration = duration;
 	_delay = delay;
 	_currentTime = 0;
 	_cursor = 0;
-	_ended = false;
-	_ready = true;
-	_loop = false;
-	_loopWithDelay = false;
+	_ended(false);
+	_ready(true);
+	_loop(false);
+	_loopWithDelay(false);
 	_loopDelay = 0;
-	_loopCount = 0;
-	_maxNumberOfLoop = 0;
-	_reverseLoop = false;
-	_currentLoopReversed = false;
-}
-
-void Tween::loop(unsigned int numberOfLoop){
-	_loop = true;
-	_loopWithDelay = false;
-	_maxNumberOfLoop = numberOfLoop;
-	_loopCount = 0;
-	_reverseLoop = false;
-	_currentLoopReversed = false;
-}
-
-void Tween::addLoop(unsigned int numberOfLoop){
-	_maxNumberOfLoop += numberOfLoop;
-}
-
-void Tween::addLoop(){
-	addLoop(1);
+	_reverseLoop(false);
+	_currentLoopReversed(false);
+	_isFirstLoop(true);
 }
 
 void Tween::loop(){
-	loop(0);
+	_loop(true);
+	_loopWithDelay(false);
+	_reverseLoop(false);
+	_currentLoopReversed(false);
 }
 
 void Tween::loopWithDelay(){
 	loopWithDelay(_delay);
 }
 
-void Tween::loopWithDelay(unsigned long delay){
-	_loop = true;
-	_loopWithDelay = true;
+void Tween::loopWithDelay(unsigned int delay){
+	_loop(true);
+	_loopWithDelay(true);
 	_loopDelay = delay;
-	_maxNumberOfLoop = 0;
-	_loopCount = 0;
-	_reverseLoop = false;
-	_currentLoopReversed = false;
+	_reverseLoop(false);
+	_currentLoopReversed(false);
 }
 
-void Tween::loopWithDelay(unsigned long delay, unsigned int numberOfLoop){
-	loopWithDelay(delay);
-	_maxNumberOfLoop = numberOfLoop;
-}
-
-unsigned int Tween::loopCount(){
-	return _loopCount;
+boolean Tween::isFirstLoop(){
+	return _isFirstLoop();
 }
 
 boolean Tween::isEnded(){
-	return _ended;
+	return _ended();
 }
 
 void Tween::stopLoop(){
-	_loop = false;
+	_loop(false);
 }
 
 void Tween::pause(){
-	_pause = true;
+	_pause(true);
 }
 
 void Tween::play(){
-	_pause = false;
+	_pause(false);
 }
 
 void Tween::toggle(){
-	_pause ? play() : pause();
+	_pause() ? play() : pause();
 }
 
 void Tween::reset(){
 	_currentTime = _delay;
-	_ended = false;
+	_ended(false);
 }
 
 void Tween::replay(){
@@ -190,7 +170,7 @@ void Tween::replay(){
 	play();
 }
 
-void Tween::replayWithDelay(unsigned long delay){
+void Tween::replayWithDelay(unsigned int delay){
 	_delay = delay;
 	replayWithDelay();
 }
@@ -200,14 +180,14 @@ void Tween::replayWithDelay(){
 	play();
 }
 
-void Tween::resetWithDelay(unsigned long delay){
+void Tween::resetWithDelay(unsigned int delay){
 	_delay = delay;
 	resetWithDelay();
 }
 
 void Tween::resetWithDelay(){
 	_currentTime = 0;
-	_ended = false;
+	_ended(false);
 }
 
 void Tween::stop(boolean restartBeforeDelay){
@@ -219,20 +199,20 @@ void Tween::stop(){
 	stop(false);
 }
 
-void Tween::transition(int startValue, int endValue, unsigned long duration){
+void Tween::transition(int startValue, int endValue, unsigned int duration){
 	transition(startValue, endValue, duration, 0);
 }
 
-void Tween::transitionTo(int endValue, unsigned long duration){
+void Tween::transitionTo(int endValue, unsigned int duration){
 	transition((int)linearValue(), endValue, duration);
 }
 
 void Tween::transitionTo(int endValue){
-	transitionTo(endValue, (_ended ? 0 : (_duration+_delay) - _currentTime));
+	transitionTo(endValue, (_ended() ? 0 : (_duration+_delay) - _currentTime));
 }
 
-long Tween::_applyEaseFactor(double _easeFactor){
-	return (long)((double)_startValue+(_easeFactor*(double)(_endValue - _startValue)));
+long Tween::_applyEaseFactor(float _easeFactor){
+	return (long)((float)_startValue+(_easeFactor*(float)(_endValue - _startValue)));
 }
 
 /*=======================*/
@@ -277,102 +257,152 @@ long Tween::easeInOutQuintValue(){
 	return _applyEaseFactor(easeInOutQuintCursor());
 };
 
-double Tween::_cursorReversed(){
-	if (!_reverseLoop){return _cursor;}
+float Tween::_cursorReversed(){
+	if (!_reverseLoop()){return _cursor;}
 	boolean delayPassed = _currentTime > _delay;
-	return _currentLoopReversed ? (delayPassed ? (1.0 - _cursor) : _cursor) : (delayPassed || loopCount() == 0 ? _cursor : (1.0 - _cursor));
+	return _currentLoopReversed() ? (delayPassed ? (1.0 - _cursor) : _cursor) : (delayPassed || isFirstLoop() ? _cursor : (1.0 - _cursor));
 }
 
-double Tween::linearCursor(){
+float Tween::linearCursor(){
 	return easeNone(_cursorReversed());
 }
 
-double Tween::easeInQuadCursor(){
+float Tween::easeInQuadCursor(){
 	return easeInQuad(_cursorReversed());
 }
 
-double Tween::easeOutQuadCursor(){
+float Tween::easeOutQuadCursor(){
 	return easeOutQuad(_cursorReversed());
 }
 
-double Tween::easeInOutQuadCursor(){
+float Tween::easeInOutQuadCursor(){
 	return easeInOutQuad(_cursorReversed());
 }
 
-double Tween::easeInCubicCursor(){
+float Tween::easeInCubicCursor(){
 	return easeInCubic(_cursorReversed());
 }
 
-double Tween::easeOutCubicCursor(){
+float Tween::easeOutCubicCursor(){
 	return easeOutCubic(_cursorReversed());
 }
 
-double Tween::easeInOutCubicCursor(){
+float Tween::easeInOutCubicCursor(){
 	return easeInOutCubic(_cursorReversed());
 }
 
-double Tween::easeInQuartCursor(){
+float Tween::easeInQuartCursor(){
 	return easeInQuart(_cursorReversed());
 }
 
-double Tween::easeOutQuartCursor(){
+float Tween::easeOutQuartCursor(){
 	return easeOutQuart(_cursorReversed());
 }
 
-double Tween::easeInOutQuartCursor(){
+float Tween::easeInOutQuartCursor(){
 	return easeInOutQuart(_cursorReversed());
 }
 
-double Tween::easeInQuintCursor(){
+float Tween::easeInQuintCursor(){
 	return easeInQuint(_cursorReversed());
 }
 
-double Tween::easeOutQuintCursor(){
+float Tween::easeOutQuintCursor(){
 	return easeOutQuint(_cursorReversed());
 }
 
-double Tween::easeInOutQuintCursor(){
+float Tween::easeInOutQuintCursor(){
 	return easeInOutQuint(_cursorReversed());
 }
 
-double Tween::easeNone(double t){
+float Tween::easeNone(float t){
 	return t;
 }
-double Tween::easeInQuad(double t){
+float Tween::easeInQuad(float t){
 	return t*t;
 }
-double Tween::easeOutQuad(double t){
+float Tween::easeOutQuad(float t){
 	return t*(2.00-t);
 }
-double Tween::easeInOutQuad(double t){
+float Tween::easeInOutQuad(float t){
 	return t<0.50 ? 2.00*t*t : -1.00+(4.00-2.00*t)*t;
 }
-double Tween::easeInCubic(double t){
+float Tween::easeInCubic(float t){
 	return t*t*t;
 }
-double Tween::easeOutCubic(double t){
+float Tween::easeOutCubic(float t){
 	return (--t)*t*t+1.00;
 }
-double Tween::easeInOutCubic(double t){
+float Tween::easeInOutCubic(float t){
 	return t<0.50 ? 4.00*t*t*t : (t-1.00)*(2.00*t-2.00)*(2.00*t-2.00)+1.00;
 }
-double Tween::easeInQuart(double t){
+float Tween::easeInQuart(float t){
 	return t*t*t*t;
 }
-double Tween::easeOutQuart(double t){
+float Tween::easeOutQuart(float t){
 	return 1-(--t)*t*t*t;
 }
-double Tween::easeInOutQuart(double t){
+float Tween::easeInOutQuart(float t){
 	return t<0.50 ? 8.00*t*t*t*t : 1.00-8.00*(--t)*t*t*t;
 }
-double Tween::easeInQuint(double t){
+float Tween::easeInQuint(float t){
 	return t*t*t*t*t;
 }
 
-double Tween::easeOutQuint(double t){
+float Tween::easeOutQuint(float t){
 	return 1.00+(--t)*t*t*t*t;
 }
 
-double Tween::easeInOutQuint(double t){
+float Tween::easeInOutQuint(float t){
 	return t<0.50 ? 16.00*t*t*t*t*t : 1.00+16.00*(--t)*t*t*t*t;
+}
+
+boolean Tween::_ended(){
+	return (boolean)bitRead(_stateBitList, TWEEN_STATE_BIT_ENDED);
+}
+boolean Tween::_ready(){
+	return (boolean)bitRead(_stateBitList, TWEEN_STATE_BIT_READY);
+}
+boolean Tween::_pause(){
+	return (boolean)bitRead(_stateBitList, TWEEN_STATE_BIT_PAUSE);
+}
+boolean Tween::_loop(){
+	return (boolean)bitRead(_stateBitList, TWEEN_STATE_BIT_LOOP);
+}
+boolean Tween::_loopWithDelay(){
+	return (boolean)bitRead(_stateBitList, TWEEN_STATE_BIT_LOOP_WITH_DELAY);
+}
+boolean Tween::_reverseLoop(){
+	return (boolean)bitRead(_stateBitList, TWEEN_STATE_BIT_REVERSE_LOOP);
+}
+boolean Tween::_currentLoopReversed(){
+	return (boolean)bitRead(_stateBitList, TWEEN_STATE_BIT_CURRENT_LOOP_REVERSED);
+}
+boolean Tween::_isFirstLoop(){
+	return (boolean)bitRead(_stateBitList, TWEEN_STATE_BIT_IS_FIRST_LOOP);
+}
+
+void Tween::_ended(boolean newValue){
+	bitWrite(_stateBitList, TWEEN_STATE_BIT_ENDED, (newValue ? 1 : 0));
+}
+void Tween::_ready(boolean newValue){
+	bitWrite(_stateBitList, TWEEN_STATE_BIT_READY, (newValue ? 1 : 0));
+}
+void Tween::_pause(boolean newValue){
+	bitWrite(_stateBitList, TWEEN_STATE_BIT_PAUSE, (newValue ? 1 : 0));
+}
+void Tween::_loop(boolean newValue){
+	bitWrite(_stateBitList, TWEEN_STATE_BIT_LOOP, (newValue ? 1 : 0));
+}
+void Tween::_loopWithDelay(boolean newValue){
+	bitWrite(_stateBitList, TWEEN_STATE_BIT_LOOP_WITH_DELAY, (newValue ? 1 : 0));
+}
+void Tween::_reverseLoop(boolean newValue){
+	bitWrite(_stateBitList, TWEEN_STATE_BIT_REVERSE_LOOP, (newValue ? 1 : 0));
+}
+void Tween::_currentLoopReversed(boolean newValue){
+	bitWrite(_stateBitList, TWEEN_STATE_BIT_CURRENT_LOOP_REVERSED, (newValue ? 1 : 0));
+}
+void Tween::_isFirstLoop(boolean newValue){
+	bitWrite(_stateBitList, TWEEN_STATE_BIT_IS_FIRST_LOOP, (newValue ? 1 : 0));
 }

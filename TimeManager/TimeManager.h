@@ -13,14 +13,11 @@ class TimeManager
 		void loopEnd();
 
 		unsigned long total();
-		unsigned long delta();
-		int maxTimeCount();
+		unsigned int delta();
 		
 	private:
 		unsigned long _time;
 		unsigned long _previousTime;
-		unsigned long _deltaTime;
-		int _maxTimeCount;
 };
 
 #endif

@@ -3,30 +3,34 @@
 
 #include "Arduino.h"
 
+#define TWEEN_STATE_BIT_ENDED 0
+#define TWEEN_STATE_BIT_READY 1
+#define TWEEN_STATE_BIT_PAUSE 2
+#define TWEEN_STATE_BIT_LOOP 3
+#define TWEEN_STATE_BIT_LOOP_WITH_DELAY 4
+#define TWEEN_STATE_BIT_REVERSE_LOOP 5
+#define TWEEN_STATE_BIT_CURRENT_LOOP_REVERSED 6
+#define TWEEN_STATE_BIT_IS_FIRST_LOOP 7
+
 class Tween
 {
 	public:
-		Tween(int startValue, int endValue, unsigned long duration, unsigned long delay);
-		Tween(int startValue, int endValue, unsigned long duration);
+		Tween(int startValue, int endValue, unsigned int duration, unsigned int delay);
+		Tween(int startValue, int endValue, unsigned int duration);
 		Tween();
 
-		void update(unsigned long deltaTime);
+		void update(unsigned int deltaTime);
 
-		void transition(int startValue, int endValue, unsigned long duration, unsigned long delay);
-		void transition(int startValue, int endValue, unsigned long duration);
-		void transitionTo(int endValue, unsigned long duration);
+		void transition(int startValue, int endValue, unsigned int duration, unsigned int delay);
+		void transition(int startValue, int endValue, unsigned int duration);
+		void transitionTo(int endValue, unsigned int duration);
 		void transitionTo(int endValue);
 
-		void loop(unsigned int numberOfLoop);
 		void loop();
 		void loopWithDelay();
-		void loopWithDelay(unsigned long delay);
-		void loopWithDelay(unsigned long delay, unsigned int numberOfLoop);
-		void addLoop(unsigned int numberOfLoop);
-		void addLoop();
+		void loopWithDelay(unsigned int delay);
 
 		void stopLoop();
-		unsigned int loopCount();
 		void reverseLoop();
 		void normalLoop();
 
@@ -44,68 +48,80 @@ class Tween
   		long easeOutQuintValue();
   		long easeInOutQuintValue();
 
-  		double linearCursor();
-  		double easeInQuadCursor();
-  		double easeOutQuadCursor();
-  		double easeInOutQuadCursor();
-  		double easeInCubicCursor();
-  		double easeOutCubicCursor();
-  		double easeInOutCubicCursor();
-  		double easeInQuartCursor();
-  		double easeOutQuartCursor();
-  		double easeInOutQuartCursor();
-  		double easeInQuintCursor();
-  		double easeOutQuintCursor();
-  		double easeInOutQuintCursor();
+  		float linearCursor();
+  		float easeInQuadCursor();
+  		float easeOutQuadCursor();
+  		float easeInOutQuadCursor();
+  		float easeInCubicCursor();
+  		float easeOutCubicCursor();
+  		float easeInOutCubicCursor();
+  		float easeInQuartCursor();
+  		float easeOutQuartCursor();
+  		float easeInOutQuartCursor();
+  		float easeInQuintCursor();
+  		float easeOutQuintCursor();
+  		float easeInOutQuintCursor();
 
-  		double easeNone(double t);
-  		double easeInQuad(double t);
-  		double easeOutQuad(double t);
-  		double easeInOutQuad(double t);
-  		double easeInCubic(double t);
-  		double easeOutCubic(double t);
-  		double easeInOutCubic(double t);
-  		double easeInQuart(double t);
-  		double easeOutQuart(double t);
-  		double easeInOutQuart(double t);
-  		double easeInQuint(double t);
-  		double easeOutQuint(double t);
-  		double easeInOutQuint(double t);
+  		float easeNone(float t);
+  		float easeInQuad(float t);
+  		float easeOutQuad(float t);
+  		float easeInOutQuad(float t);
+  		float easeInCubic(float t);
+  		float easeOutCubic(float t);
+  		float easeInOutCubic(float t);
+  		float easeInQuart(float t);
+  		float easeOutQuart(float t);
+  		float easeInOutQuart(float t);
+  		float easeInQuint(float t);
+  		float easeOutQuint(float t);
+  		float easeInOutQuint(float t);
 
 		void pause();
 		void play();
 		void toggle();
 		void reset();
 		void replay();
-		void replayWithDelay(unsigned long delay);
+		void replayWithDelay(unsigned int delay);
 		void replayWithDelay();
-		void resetWithDelay(unsigned long delay);
+		void resetWithDelay(unsigned int delay);
 		void resetWithDelay();
 		void stop(boolean restartBeforeDelay);
 		void stop();
 
+		boolean isFirstLoop();
 		boolean isEnded();
 
 	private:
-		boolean _ended;
-		boolean _ready;
-		boolean _pause;
-		boolean _loop;
-		boolean _loopWithDelay;
-		boolean _reverseLoop;
-		boolean _currentLoopReversed;
-		unsigned int _maxNumberOfLoop;
-		unsigned int _loopCount;
+		byte _stateBitList;
+		
+		boolean _ended();
+		boolean _ready();
+		boolean _pause();
+		boolean _loop();
+		boolean _loopWithDelay();
+		boolean _reverseLoop();
+		boolean _currentLoopReversed();
+		boolean _isFirstLoop();
+
+		void _ended(boolean newValue);
+		void _ready(boolean newValue);
+		void _pause(boolean newValue);
+		void _loop(boolean newValue);
+		void _loopWithDelay(boolean newValue);
+		void _reverseLoop(boolean newValue);
+		void _currentLoopReversed(boolean newValue);
+		void _isFirstLoop(boolean newValue);
+		
 		int _startValue;
 		int _endValue;
-		unsigned long _duration;
-		unsigned long _delay;
-		unsigned long _loopDelay;
-		unsigned long _currentTime;
-		double _cursor;
+		unsigned int _duration;
+		unsigned int _delay;
+		unsigned int _loopDelay;
+		unsigned int _currentTime;
+		float _cursor;
 
-		double _cursorReversed();
-		long _applyEaseFactor(double _easeFactor);
+		float _cursorReversed();
+		long _applyEaseFactor(float _easeFactor);
 };
 
 #endif

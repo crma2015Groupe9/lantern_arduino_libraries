@@ -18,7 +18,7 @@ class Colors
 		byte green();
 		byte blue();
 
-		Colors getGradientStep(double cursorPosition, Colors targetColor);
+		Colors getGradientStep(float cursorPosition, Colors targetColor);
 		Colors getColorWithAlpha(float alpha);
 
 	private:
