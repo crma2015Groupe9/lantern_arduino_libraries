@@ -6,27 +6,22 @@
 class Tween
 {
 	public:
-		Tween(int startValue, int endValue, unsigned long duration, unsigned long delay);
-		Tween(int startValue, int endValue, unsigned long duration);
+		Tween(int startValue, int endValue, unsigned int duration, unsigned int delay);
+		Tween(int startValue, int endValue, unsigned int duration);
 		Tween();
 
-		void update(unsigned long deltaTime);
+		void update(unsigned int deltaTime);
 
-		void transition(int startValue, int endValue, unsigned long duration, unsigned long delay);
-		void transition(int startValue, int endValue, unsigned long duration);
-		void transitionTo(int endValue, unsigned long duration);
+		void transition(int startValue, int endValue, unsigned int duration, unsigned int delay);
+		void transition(int startValue, int endValue, unsigned int duration);
+		void transitionTo(int endValue, unsigned int duration);
 		void transitionTo(int endValue);
 
-		void loop(unsigned int numberOfLoop);
 		void loop();
 		void loopWithDelay();
-		void loopWithDelay(unsigned long delay);
-		void loopWithDelay(unsigned long delay, unsigned int numberOfLoop);
-		void addLoop(unsigned int numberOfLoop);
-		void addLoop();
+		void loopWithDelay(unsigned int delay);
 
 		void stopLoop();
-		unsigned int loopCount();
 		void reverseLoop();
 		void normalLoop();
 
@@ -77,14 +72,15 @@ class Tween
 		void toggle();
 		void reset();
 		void replay();
-		void replayWithDelay(unsigned long delay);
+		void replayWithDelay(unsigned int delay);
 		void replayWithDelay();
-		void resetWithDelay(unsigned long delay);
+		void resetWithDelay(unsigned int delay);
 		void resetWithDelay();
 		void stop(boolean restartBeforeDelay);
 		void stop();
 
 		boolean isEnded();
+		boolean isFirstLoop();
 
 	private:
 		boolean _ended;
@@ -94,14 +90,13 @@ class Tween
 		boolean _loopWithDelay;
 		boolean _reverseLoop;
 		boolean _currentLoopReversed;
-		unsigned int _maxNumberOfLoop;
-		unsigned int _loopCount;
+		boolean _firstLoop;
 		int _startValue;
 		int _endValue;
-		unsigned long _duration;
-		unsigned long _delay;
-		unsigned long _loopDelay;
-		unsigned long _currentTime;
+		unsigned int _duration;
+		unsigned int _delay;
+		unsigned int _loopDelay;
+		unsigned int _currentTime;
 		double _cursor;
 
 		double _cursorReversed();

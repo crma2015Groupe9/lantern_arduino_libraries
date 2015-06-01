@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "Tween.h"
 
-Tween::Tween(int startValue, int endValue, unsigned long duration, unsigned long delay){
+Tween::Tween(int startValue, int endValue, unsigned int duration, unsigned int delay){
 	_startValue = startValue;
 	_endValue = endValue;
 	_duration = duration;
@@ -14,13 +14,12 @@ Tween::Tween(int startValue, int endValue, unsigned long duration, unsigned long
 	_loop = false;
 	_loopWithDelay = false;
 	_loopDelay = 0;
-	_loopCount = 0;
-	_maxNumberOfLoop = 0;
 	_reverseLoop = false;
 	_currentLoopReversed = false;
+	_firstLoop = true;
 }
 
-Tween::Tween(int startValue, int endValue, unsigned long duration){
+Tween::Tween(int startValue, int endValue, unsigned int duration){
 	_startValue = startValue;
 	_endValue = endValue;
 	_duration = duration;
@@ -33,10 +32,9 @@ Tween::Tween(int startValue, int endValue, unsigned long duration){
 	_loop = false;
 	_loopWithDelay = false;
 	_loopDelay = 0;
-	_loopCount = 0;
-	_maxNumberOfLoop = 0;
 	_reverseLoop = false;
 	_currentLoopReversed = false;
+	_firstLoop = true;
 }
 
 Tween::Tween(){
@@ -52,13 +50,12 @@ Tween::Tween(){
 	_loop = false;
 	_loopWithDelay = false;
 	_loopDelay = 0;
-	_loopCount = 0;
-	_maxNumberOfLoop = 0;
 	_reverseLoop = false;
 	_currentLoopReversed = false;
+	_firstLoop = true;
 }
 
-void Tween::update(unsigned long deltaTime){
+void Tween::update(unsigned int deltaTime){
 	int temp;
 	if (_ready && !_ended)
 	{
@@ -73,7 +70,7 @@ void Tween::update(unsigned long deltaTime){
 			_currentTime = _duration+_delay;
 			_ended = true;
 
-			if(_loop && (_maxNumberOfLoop == 0 || (_loopCount+1) < _maxNumberOfLoop)){
+			if(_loop){
 				_ended = false;
 				_ready = true;
 				_currentTime = 0;
@@ -84,7 +81,7 @@ void Tween::update(unsigned long deltaTime){
 					_currentLoopReversed = !_currentLoopReversed;
 				}
 
-				_loopCount++;
+				_firstLoop = false;
 			}
 		}
 	}
@@ -98,7 +95,7 @@ void Tween::normalLoop(){
 	_reverseLoop = false;
 }
 
-void Tween::transition(int startValue, int endValue, unsigned long duration, unsigned long delay){
+void Tween::transition(int startValue, int endValue, unsigned int duration, unsigned int delay){
 	_startValue = startValue;
 	_endValue = endValue;
 	_duration = duration;
@@ -110,58 +107,36 @@ void Tween::transition(int startValue, int endValue, unsigned long duration, uns
 	_loop = false;
 	_loopWithDelay = false;
 	_loopDelay = 0;
-	_loopCount = 0;
-	_maxNumberOfLoop = 0;
 	_reverseLoop = false;
 	_currentLoopReversed = false;
-}
-
-void Tween::loop(unsigned int numberOfLoop){
-	_loop = true;
-	_loopWithDelay = false;
-	_maxNumberOfLoop = numberOfLoop;
-	_loopCount = 0;
-	_reverseLoop = false;
-	_currentLoopReversed = false;
-}
-
-void Tween::addLoop(unsigned int numberOfLoop){
-	_maxNumberOfLoop += numberOfLoop;
-}
-
-void Tween::addLoop(){
-	addLoop(1);
+	_firstLoop = true;
 }
 
 void Tween::loop(){
-	loop(0);
+	_loop = true;
+	_loopWithDelay = false;
+	_reverseLoop = false;
+	_currentLoopReversed = false;
 }
 
 void Tween::loopWithDelay(){
 	loopWithDelay(_delay);
 }
 
-void Tween::loopWithDelay(unsigned long delay){
+void Tween::loopWithDelay(unsigned int delay){
 	_loop = true;
 	_loopWithDelay = true;
 	_loopDelay = delay;
-	_maxNumberOfLoop = 0;
-	_loopCount = 0;
 	_reverseLoop = false;
 	_currentLoopReversed = false;
 }
 
-void Tween::loopWithDelay(unsigned long delay, unsigned int numberOfLoop){
-	loopWithDelay(delay);
-	_maxNumberOfLoop = numberOfLoop;
-}
-
-unsigned int Tween::loopCount(){
-	return _loopCount;
-}
-
 boolean Tween::isEnded(){
 	return _ended;
+}
+
+boolean Tween::isFirstLoop(){
+	return _firstLoop;
 }
 
 void Tween::stopLoop(){
@@ -190,7 +165,7 @@ void Tween::replay(){
 	play();
 }
 
-void Tween::replayWithDelay(unsigned long delay){
+void Tween::replayWithDelay(unsigned int delay){
 	_delay = delay;
 	replayWithDelay();
 }
@@ -200,7 +175,7 @@ void Tween::replayWithDelay(){
 	play();
 }
 
-void Tween::resetWithDelay(unsigned long delay){
+void Tween::resetWithDelay(unsigned int delay){
 	_delay = delay;
 	resetWithDelay();
 }
@@ -219,11 +194,11 @@ void Tween::stop(){
 	stop(false);
 }
 
-void Tween::transition(int startValue, int endValue, unsigned long duration){
+void Tween::transition(int startValue, int endValue, unsigned int duration){
 	transition(startValue, endValue, duration, 0);
 }
 
-void Tween::transitionTo(int endValue, unsigned long duration){
+void Tween::transitionTo(int endValue, unsigned int duration){
 	transition((int)linearValue(), endValue, duration);
 }
 
@@ -280,7 +255,7 @@ long Tween::easeInOutQuintValue(){
 double Tween::_cursorReversed(){
 	if (!_reverseLoop){return _cursor;}
 	boolean delayPassed = _currentTime > _delay;
-	return _currentLoopReversed ? (delayPassed ? (1.0 - _cursor) : _cursor) : (delayPassed || loopCount() == 0 ? _cursor : (1.0 - _cursor));
+	return _currentLoopReversed ? (delayPassed ? (1.0 - _cursor) : _cursor) : (delayPassed || isFirstLoop() ? _cursor : (1.0 - _cursor));
 }
 
 double Tween::linearCursor(){
