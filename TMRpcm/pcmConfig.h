@@ -26,13 +26,13 @@ Blog: https://tmrh20.blogspot.com/
 
    Override the default size of the buffers (MAX 254). There are 2 buffers, so memory usage will be double this number
    Defaults to 64bytes for Uno etc. 254 for Mega etc. note: In multi mode there are 4 buffers*/
-//#define buffSize 128  //must be an even number
+#define buffSize 168  //must be an even number
 
   /* Uncomment to run the SD card at full speed (half speed is default for standard SD lib)*/
 #define SD_FULLSPEED
 
   /* HANDLE_TAGS - This options allows proper playback of WAV files with embedded metadata*/
-//#define HANDLE_TAGS
+#define HANDLE_TAGS
 
   /*Ethernet shield support etc. The library outputs on both timer pins, 9 and 10 on Uno by default. Uncommenting this
     will disable output on the 2nd timer pin and should allow it to function with shields etc that use Uno pin 10 (TIMER1 COMPB).*/
@@ -53,7 +53,7 @@ Blog: https://tmrh20.blogspot.com/
 
    /* Enables 16-bit samples, which can be used for stereo playback, or to produce a
 	   pseudo 16-bit output.                                                   */
-//#define STEREO_OR_16BIT
+#define STEREO_OR_16BIT
 
    /* In Normal single track mode, MODE2 will modify the behavior of STEREO or 16BIT output
         With MODE2 off, stereo tracks will be played using 2 pins, for 2 speakers in non-complimentary mode (pin to ground)

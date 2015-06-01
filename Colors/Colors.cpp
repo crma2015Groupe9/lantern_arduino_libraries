@@ -39,18 +39,18 @@ byte Colors::blue(){
 	return _blue;
 }
 
-Colors Colors::getGradientStep(double cursorPosition, Colors targetColor){
-	double start, end, finalRed, finalGreen, finalBlue;
+Colors Colors::getGradientStep(float cursorPosition, Colors targetColor){
+	float start, end, finalRed, finalGreen, finalBlue;
 
-	start = (double)red(); end = (double)targetColor.red();
+	start = (float)red(); end = (float)targetColor.red();
 	finalRed = start+((end - start)*cursorPosition);
 	finalRed = finalRed < 0 ? 0 : (finalRed > 255 ? 255 : finalRed);
 
-	start = (double)green(); end = (double)targetColor.green();
+	start = (float)green(); end = (float)targetColor.green();
 	finalGreen = start+((end - start)*cursorPosition);
 	finalGreen = finalGreen < 0 ? 0 : (finalGreen > 255 ? 255 : finalGreen);
 
-	start = (double)blue(); end = (double)targetColor.blue();
+	start = (float)blue(); end = (float)targetColor.blue();
 	finalBlue = start+((end - start)*cursorPosition);
 	finalBlue = finalBlue < 0 ? 0 : (finalBlue > 255 ? 255 : finalBlue);
 
@@ -58,6 +58,7 @@ Colors Colors::getGradientStep(double cursorPosition, Colors targetColor){
 }
 
 Colors Colors::getColorWithAlpha(float alpha){
+	//return getGradientStep(alpha, Colors(0,0,0));
 	double start, finalRed, finalGreen, finalBlue;
 	float opacity = 1.0 - alpha;
 
