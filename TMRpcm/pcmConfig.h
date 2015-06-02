@@ -26,7 +26,7 @@ Blog: https://tmrh20.blogspot.com/
 
    Override the default size of the buffers (MAX 254). There are 2 buffers, so memory usage will be double this number
    Defaults to 64bytes for Uno etc. 254 for Mega etc. note: In multi mode there are 4 buffers*/
-#define buffSize 168  //must be an even number
+#define buffSize 200  //must be an even number
 
   /* Uncomment to run the SD card at full speed (half speed is default for standard SD lib)*/
 #define SD_FULLSPEED

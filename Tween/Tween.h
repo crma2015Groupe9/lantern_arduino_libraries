@@ -91,6 +91,9 @@ class Tween
 		boolean isFirstLoop();
 		boolean isEnded();
 
+		int startValue();
+		int endValue();
+
 	private:
 		byte _stateBitList;
 		

@@ -91,6 +91,14 @@ void Tween::update(unsigned int deltaTime){
 	}
 }
 
+int Tween::startValue(){
+	return _startValue;
+}
+
+int Tween::endValue(){
+	return _endValue;
+}
+
 void Tween::reverseLoop(){
 	_reverseLoop(true);
 }
